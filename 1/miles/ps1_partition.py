@@ -1,4 +1,11 @@
-# From codereview.stackexchange.com                    
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Oct 13 10:24:38 2017
+
+@author: mtaylor
+"""
+
 def partitions(set_):
     if not set_:
         yield []
