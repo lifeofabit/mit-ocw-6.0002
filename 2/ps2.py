@@ -114,13 +114,29 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
         If there exists no path that satisfies max_total_dist and
         max_dist_outdoors constraints, then return None.
     """
-    # TODO
     if not digraph.has_node(Node(start)) or not digraph.has_node(Node(end)):
-        raise ValueError('Node {} or {} does not exist in the graph')
+        raise ValueError('Node {} or {} does not exist in the graph'.format(start, end))
     elif Node(start) == Node(end):
-        best_path, best_dist = path, 0
+        if not best_path:
+            if path[2] <= max_dist_outdoors:
+                # print 'Best path is now {}'.format(path[0])
+                best_path, best_dist = path[0], path[1]
 
+        
+        elif (len(path[0]) <= len(best_path) and path[1] < best_dist and path[2] <= max_dist_outdoors):
+            # print 'Found end with path length {} ({}) and best length {} ({})'.format(len(path[0]), path[1], len(best_path), best_dist)
+            # print path[0]
+            # print best_path
+            # print 'Replacing {} (length {}) with {} (length {}) and outdoor {}'.format(path[0], len(path[0]), best_path, len(best_path), path[2])
+            best_path, best_dist = path[0], path[1] 
     else:
+        for child in digraph.get_edges_for_node(Node(start)):
+            # print '{} -> {}'.format(str(child.src), str(child.dest))
+            if str(child.dest) not in path[0]:
+                # print '{} | Evaluating {} -> {}'.format(path[0], child.src, child.dest)
+                child_path = [path[0] + [str(child.dest)], path[1] + child.get_total_distance(), path[2] + child.get_outdoor_distance()]
+                best_path, best_dist = get_best_path(digraph,str(child.dest),end,child_path,max_dist_outdoors,best_dist,best_path)
+
 
     return best_path, best_dist
 
@@ -154,8 +170,12 @@ def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
         If there exists no path that satisfies max_total_dist and
         max_dist_outdoors constraints, then raises a ValueError.
     """
-    # TODO
-    pass
+    best_path, best_dist = get_best_path(digraph,start,end,[[start],0,0],max_dist_outdoors,0,None)
+    print best_path, best_dist
+    if best_dist > max_total_dist or not best_path:
+        raise ValueError('The best found path cannot satisfy the constraints')
+
+    return best_path
 
 
 # ================================================================
